@@ -5,5 +5,7 @@ description = "Laboratory work on the subject \"Classical mathematical models of
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "pandas>=2.3.2",
     "requests>=2.32.5",
+    "scikit-learn>=1.7.2",
 ]
