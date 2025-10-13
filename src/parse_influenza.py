@@ -50,6 +50,11 @@ def fetch_bulletin(year: int, week: int):
 def _get_year_week_pairs(start_year: int, start_week: int, end_year: int, end_week: int):
     years_weeks = []
 
+    if start_year == end_year:
+        for week in range(start_week, end_week + 1):
+            years_weeks.append((start_year, week))
+        return years_weeks
+
     for week in range(start_week, 53 + 1):
         years_weeks.append((start_year, week))
 
