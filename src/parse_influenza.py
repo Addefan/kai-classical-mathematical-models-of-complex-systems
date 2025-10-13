@@ -8,6 +8,8 @@ from requests import Session
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
+from errors import ParsingError
+
 BASE_URL = "https://www.influenza.spb.ru/surveillance/flu-bulletin"
 
 retry_strategy = Retry(
@@ -22,11 +24,13 @@ session.mount("https://", adapter)
 
 
 def extract_incidence_rate(html_text: str):
-    incidence = re.search(r"составив\s(\d+[,.]\d)\sна\s10\s000\sнаселения", html_text)
+    incidence = re.search(r"(\d+[,.]\d)\sна\s10\s000\sнаселения", html_text)
     if incidence is None:
-        return None
+        if "<main>" in html_text:
+            return None, ParsingError.not_found
+        return None, ParsingError.not_exist
 
-    return float(incidence.group(1).replace(",", "."))
+    return float(incidence.group(1).replace(",", ".")), None
 
 
 def fetch_bulletin(year: int, week: int):
@@ -39,8 +43,8 @@ def fetch_bulletin(year: int, week: int):
     response.raise_for_status()
     time.sleep(0.5)
 
-    incidence = extract_incidence_rate(html.unescape(response.text))
-    return incidence
+    incidence, error = extract_incidence_rate(html.unescape(response.text))
+    return incidence, error
 
 
 def _get_year_week_pairs(start_year: int, start_week: int, end_year: int, end_week: int):
@@ -65,9 +69,12 @@ def fetch_statistics(start_year: int, start_week: int, end_year: int, end_week: 
         writer.writeheader()
 
         for year, week in _get_year_week_pairs(start_year, start_week, end_year, end_week):
-            incidence = fetch_bulletin(year, week)
-            if incidence is None:
-                print(f"Данных за {week} неделю {year} года нет.")
+            incidence, error = fetch_bulletin(year, week)
+            if error:
+                if error == ParsingError.not_found:
+                    print(f"\033[91mНе удалось достать\033[0m данные за {week} неделю {year} года.")
+                elif error == ParsingError.not_exist:
+                    print(f"Данных за {week} неделю {year} года на сайте нет.")
                 continue
 
             row = {
