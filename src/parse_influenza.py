@@ -1,5 +1,6 @@
 import csv
 import re
+import sys
 import time
 
 from requests import Session
@@ -76,6 +77,15 @@ def fetch_statistics(start_year: int, start_week: int, end_year: int, end_week: 
             writer.writerow(row)
 
 
+def main(output_csv="statistics.csv"):
+    start_date = map(int, input("Введите год и неделю \033[1mначала\033[0m сбора данных через пробел: ").split())
+    end_date = map(int, input("Введите год и неделю \033[1mокончания\033[0m сбора данных через пробел: ").split())
+    fetch_statistics(*start_date, *end_date, output_csv=output_csv)
+
+
 if __name__ == "__main__":
-    start, end = (2020, 17), (2025, 38)
-    fetch_statistics(*start, *end, output_csv="statistics.csv")
+    output_csv = "statistics.csv"
+    if len(sys.argv) > 1:
+        output_csv = sys.argv[1]
+
+    main(output_csv)
