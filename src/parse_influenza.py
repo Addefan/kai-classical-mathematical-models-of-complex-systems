@@ -1,4 +1,5 @@
 import csv
+import html
 import re
 import sys
 import time
@@ -20,8 +21,8 @@ session.mount("http://", adapter)
 session.mount("https://", adapter)
 
 
-def extract_incidence_rate(html: str):
-    incidence = re.search(r"составив\s(\d+[,.]\d)\sна\s10\s000\sнаселения", html)
+def extract_incidence_rate(html_text: str):
+    incidence = re.search(r"составив\s(\d+[,.]\d)\sна\s10\s000\sнаселения", html_text)
     if incidence is None:
         return None
 
@@ -38,7 +39,7 @@ def fetch_bulletin(year: int, week: int):
     response.raise_for_status()
     time.sleep(0.5)
 
-    incidence = extract_incidence_rate(response.text)
+    incidence = extract_incidence_rate(html.unescape(response.text))
     return incidence
 
 
