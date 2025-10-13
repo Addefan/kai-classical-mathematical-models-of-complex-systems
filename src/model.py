@@ -17,7 +17,7 @@ def train(input_csv="statistics.csv"):
     X, y = get_data(input_csv)
     X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8)
 
-    model = RandomForestRegressor(n_estimators=1000)
+    model = RandomForestRegressor()
     print("\nОбучение модели...\n")
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
