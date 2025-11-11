@@ -3,5 +3,7 @@ name = "kai-classical-mathematical-models-of-complex-systems"
 version = "0.1.0"
 description = "Laboratory work on the subject \"Classical mathematical models of complex systems\""
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+requires-python = ">=3.8"
+dependencies = [
+    "typer>=0.20.0",
+]
