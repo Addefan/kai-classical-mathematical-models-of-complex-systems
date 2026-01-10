@@ -5,5 +5,6 @@ description = "Laboratory work on the subject \"Classical mathematical models of
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "matplotlib>=3.10.8",
     "pandas>=2.3.3",
 ]
