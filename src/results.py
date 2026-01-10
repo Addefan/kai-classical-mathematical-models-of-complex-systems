@@ -3,12 +3,12 @@ from functools import wraps
 import matplotlib.pyplot as plt
 
 
-def plot_results(data, dr_system=None):
+def plot_results(data, dr_system=None, pf_system=None):
     plt.figure(figsize=(16, 12))
-    plot_trajectory(data, dr_system)
-    plot_x(data, dr_system)
-    plot_z(data, dr_system)
-    plot_error(data, dr_system)
+    plot_trajectory(data, dr_system, pf_system)
+    plot_x(data, dr_system, pf_system)
+    plot_z(data, dr_system, pf_system)
+    plot_error(data, dr_system, pf_system)
     plt.show()
 
 
@@ -36,33 +36,48 @@ def plot(nrows, ncols, title, xlabel, ylabel):
 
 
 @plot(2, 2, "Ошибка определения места положения", "Время, с", "Ошибка, м")
-def plot_error(data, dr_system):
+def plot_error(data, dr_system, pf_system):
     if dr_system is not None:
         plt.plot(data["t"], dr_system.history["error"], "r", label="Без комплексирования")
 
+    if pf_system is not None:
+        plt.plot(data["t"], pf_system.history["error"], "b", label="С комплексированием")
+
 
 @plot(2, 2, "Координата X во времени", "Время, с", "Координата X, м")
-def plot_x(data, dr_system):
+def plot_x(data, dr_system, pf_system):
     plt.plot(data["t"], data["x"], "k--", label="Со спутника")
 
     if dr_system is not None:
         dr_x, _ = dr_system.get_trajectory()
         plt.plot(data["t"], dr_x, "r", label="Без комплексирования")
 
+    if pf_system is not None:
+        pf_x, _ = pf_system.get_trajectory()
+        plt.plot(data["t"], pf_x, "b", label="С комплексированием")
+
 
 @plot(2, 2, "Координата Z во времени", "Время, с", "Координата Z, м")
-def plot_z(data, dr_system):
+def plot_z(data, dr_system, pf_system):
     plt.plot(data["t"], data["z"], "k--", label="Со спутника")
 
     if dr_system is not None:
         _, dr_z = dr_system.get_trajectory()
         plt.plot(data["t"], dr_z, "r", label="Без комплексирования")
 
+    if pf_system is not None:
+        _, pf_z = pf_system.get_trajectory()
+        plt.plot(data["t"], pf_z, "b", label="С комплексированием")
+
 
 @plot(2, 2, "Траектория полета", "Координата X, м", "Координата Z, м")
-def plot_trajectory(data, dr_system):
+def plot_trajectory(data, dr_system, pf_system):
     plt.plot(data["x"], data["z"], "k--", label="Со спутника")
 
     if dr_system is not None:
         dr_x, dr_z = dr_system.get_trajectory()
         plt.plot(dr_x, dr_z, "r", label="Без комплексирования")
+
+    if pf_system is not None:
+        pf_x, pf_z = pf_system.get_trajectory()
+        plt.plot(pf_x, pf_z, "b", label="С комплексированием")
