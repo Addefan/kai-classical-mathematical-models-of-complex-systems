@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 
@@ -19,6 +20,35 @@ class FlightDataLoader:
         self.data["z"] = df.iloc[:, 7].values  # координата Z со спутника, м
 
         return self.data
+
+
+class SensorSuite:
+    def __init__(self, gyro_drift_rate=0.00003, gyro_noise_std=0.3, gps_noise_std=3.0):
+        self.gyro_drift_rate = gyro_drift_rate
+        self.gyro_noise_std = gyro_noise_std
+        self.gps_noise_std = gps_noise_std
+        self.current_gyro_bias = 0.0
+
+    def read_sensors(self, data, dt):
+        self.current_gyro_bias += self.gyro_drift_rate * dt
+        gyro_noise = np.random.normal(0, self.gyro_noise_std)
+        measured_psi = data["psi"] + self.current_gyro_bias + gyro_noise
+
+        gps_x_noise = np.random.normal(0, self.gps_noise_std)
+        gps_z_noise = np.random.normal(0, self.gps_noise_std)
+        measured_x = data["x"] + gps_x_noise
+        measured_z = data["z"] + gps_z_noise
+
+        return {
+            "t": data["t"],
+            "alpha": data["alpha"],
+            "psi": measured_psi,
+            "v": data["v"],
+            "omega": data["omega"],
+            "w": data["w"],
+            "x": measured_x,
+            "z": measured_z,
+        }
 
 
 if __name__ == "__main__":
