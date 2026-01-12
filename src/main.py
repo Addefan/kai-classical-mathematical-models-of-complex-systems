@@ -17,13 +17,10 @@ def run_simulation(file_path="flight.csv"):
         dt = data["t"][i] - data["t"][i - 1]
         measurements = sensors.read_sensors({key: data[key][i] for key in data}, dt)
 
-        current_x_dr, current_z_dr = dr_system.update(measurements, dt)
-        error_dr = np.sqrt((current_x_dr - data["x"][i]) ** 2 + (current_z_dr - data["z"][i]) ** 2)
-        dr_system.history["error"].append(error_dr)
-
-        current_x_pf, current_z_pf = pf_system.update(measurements, dt)
-        error_pf = np.sqrt((current_x_pf - data["x"][i]) ** 2 + (current_z_pf - data["z"][i]) ** 2)
-        pf_system.history["error"].append(error_pf)
+        for system in (dr_system, pf_system):
+            current_x, current_z = system.update(measurements, dt)
+            error = np.sqrt((current_x - data["x"][i]) ** 2 + (current_z - data["z"][i]) ** 2)
+            system.history["error"].append(error)
 
     plot_results(data, dr_system, pf_system)
 
