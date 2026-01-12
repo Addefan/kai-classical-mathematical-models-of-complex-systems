@@ -1,14 +1,12 @@
-import sys
 import time
+from copy import deepcopy
 
-from game import SimpleGameLife
+from events import EventHandler, IterationEvent
+from game import SimpleGameLife, DEVSGameLife
 
 
-def run_game(game, width, height, start_grid, delay=None):
+def run_game(game, delay=None):
     print("Запуск игры \"Жизнь\"...\n")
-
-    game = game(width, height)
-    game.current_grid = start_grid
 
     print("Управление игрой:")
     print("• для начала игры нажмите \033[7mEnter\033[0m;")
@@ -33,7 +31,6 @@ def run_game(game, width, height, start_grid, delay=None):
 
     except KeyboardInterrupt:
         print("Игра остановлена пользователем.")
-        sys.exit(0)
 
 
 def main():
@@ -52,9 +49,13 @@ def main():
     start_grid[8][0] = start_grid[7][1] = 1
     start_grid[7][2] = start_grid[8][2] = start_grid[9][2] = 1
 
+    simple_game = SimpleGameLife(width, height, deepcopy(start_grid))
+    devs_game = DEVSGameLife(width, height, deepcopy(start_grid))
     delay = 0.5
 
-    run_game(SimpleGameLife, width, height, start_grid, delay)
+    run_game(simple_game, delay)
+    EventHandler.add_event(IterationEvent(0, devs_game))
+    run_game(devs_game, delay)
 
 
 if __name__ == "__main__":
